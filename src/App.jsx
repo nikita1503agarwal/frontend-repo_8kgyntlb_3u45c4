@@ -1,27 +1,45 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import Hero from './components/Hero'
+import Layout from './components/Layout'
+import BusinessForm from './components/BusinessForm'
+import Results from './components/Results'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [data, setData] = useState(null)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+    <Layout>
+      <Hero />
+      <section id="form" className="relative z-10 -mt-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="rounded-2xl bg-white/80 backdrop-blur shadow-xl p-6"
           >
-            Count is {count}
-          </button>
+            <h2 className="text-2xl font-semibold text-gray-900">Tell us about your business</h2>
+            <p className="text-gray-600 mb-4">One form builds your entire AI-powered operations hub.</p>
+            <BusinessForm onGenerated={setData} />
+          </motion.div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <section id="results" className="mt-8">
+        <div className="max-w-7xl mx-auto px-6">
+          {data ? (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <Results data={data} />
+            </motion.div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-gray-300 p-8 text-center text-gray-600 bg-white/60">
+              Generated results will appear here after you submit the form.
+            </div>
+          )}
+        </div>
+      </section>
+    </Layout>
   )
 }
 
