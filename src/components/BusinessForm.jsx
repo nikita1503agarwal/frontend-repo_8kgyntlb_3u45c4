@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Loader2, Wand2, Sparkles } from 'lucide-react'
+import { Loader2, Wand2, Sparkles, Rocket } from 'lucide-react'
 
 const defaultState = {
   business_name: '',
@@ -36,31 +36,33 @@ export default function BusinessForm({ onGenerated }) {
 
   const parseList = (val) => val.split(',').map((s) => s.trim()).filter(Boolean)
 
+  const buildPayload = () => ({
+    business_name: form.business_name,
+    industry: form.industry,
+    services: parseList(form.services),
+    location: form.location,
+    target_audience: form.target_audience,
+    goals: parseList(form.goals),
+    tone: form.tone,
+    brand_colors: parseList(form.brand_colors),
+    brand_voice: form.brand_voice || null,
+    faqs: parseList(form.faqs).map((q) => ({ question: q, answer: '' })),
+    examples: parseList(form.examples),
+    subscription_tier: form.subscription_tier,
+    website_url: form.website_url || null,
+    contact: {
+      name: form.contact_name || null,
+      email: form.contact_email || null,
+      phone: form.contact_phone || null,
+    },
+  })
+
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e?.preventDefault?.()
     setError('')
     setLoading(true)
 
-    const payload = {
-      business_name: form.business_name,
-      industry: form.industry,
-      services: parseList(form.services),
-      location: form.location,
-      target_audience: form.target_audience,
-      goals: parseList(form.goals),
-      tone: form.tone,
-      brand_colors: parseList(form.brand_colors),
-      brand_voice: form.brand_voice || null,
-      faqs: parseList(form.faqs).map((q) => ({ question: q, answer: '' })),
-      examples: parseList(form.examples),
-      subscription_tier: form.subscription_tier,
-      website_url: form.website_url || null,
-      contact: {
-        name: form.contact_name || null,
-        email: form.contact_email || null,
-        phone: form.contact_phone || null,
-      },
-    }
+    const payload = buildPayload()
 
     try {
       const res = await fetch(`${backend}/generate`, {
@@ -77,6 +79,30 @@ export default function BusinessForm({ onGenerated }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const useSample = async (tier = 'premium') => {
+    const sample = {
+      business_name: 'NovaFit Studio',
+      industry: 'Fitness & Wellness',
+      services: 'Personal training, Group classes, Nutrition coaching, Online programs',
+      location: 'Austin, TX',
+      target_audience: 'Busy professionals 25-45',
+      goals: 'Grow memberships, Increase class attendance, Boost retention',
+      tone: 'friendly, expert',
+      brand_colors: '#6d28d9,#0ea5e9,#10b981',
+      brand_voice: 'Energetic, encouraging, results-driven',
+      faqs: 'Do you offer free trials?, What are your hours?, Do you have corporate plans?',
+      examples: 'Ask about pricing, Book a session, Cancel a class, Get a meal plan',
+      subscription_tier: tier,
+      website_url: '',
+      contact_name: 'Jamie Rivera',
+      contact_email: 'hello@novafit.co',
+      contact_phone: '(512) 555-0101',
+    }
+    setForm(sample)
+    // Give state a tick to update before submitting
+    setTimeout(() => handleSubmit(), 50)
   }
 
   const Input = (props) => (
@@ -97,8 +123,13 @@ export default function BusinessForm({ onGenerated }) {
         <div className="rounded-md bg-red-50 p-3 text-red-700 border border-red-200">{error}</div>
       )}
 
-      <div className="rounded-lg bg-gradient-to-r from-indigo-50 to-emerald-50 border border-indigo-100 p-3 text-xs text-gray-700 flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-indigo-600" />{hint}
+      <div className="rounded-lg bg-gradient-to-r from-indigo-50 to-emerald-50 border border-indigo-100 p-3 text-xs text-gray-700 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-indigo-600" />{hint}</div>
+        <div className="flex items-center gap-2">
+          <motion.button type="button" whileHover={{scale: 1.02}} whileTap={{scale: 0.98}} onClick={() => useSample('standard')} className="inline-flex items-center rounded-md border border-indigo-200 bg-white px-2 py-1 text-xs text-indigo-700 hover:bg-indigo-50">
+            <Rocket className="h-3.5 w-3.5 mr-1" /> Use sample data
+          </motion.button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -155,9 +186,12 @@ export default function BusinessForm({ onGenerated }) {
           <Input name="contact_phone" value={form.contact_phone} onChange={handleChange} placeholder="(555) 555-5555" />
         </Field>
       </div>
-      <motion.button whileHover={{scale: 1.01}} whileTap={{scale: 0.99}} type="submit" disabled={loading} className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white shadow hover:bg-indigo-700 transition">
-        {loading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Generating…</>) : (<><Wand2 className="h-4 w-4 mr-2" />Generate My AI Business Assistant</>)}
-      </motion.button>
+      <div className="flex items-center gap-3">
+        <motion.button whileHover={{scale: 1.01}} whileTap={{scale: 0.99}} type="submit" disabled={loading} className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white shadow hover:bg-indigo-700 transition">
+          {loading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Generating…</>) : (<><Wand2 className="h-4 w-4 mr-2" />Generate My AI Business Assistant</>)}
+        </motion.button>
+        <button type="button" onClick={() => setForm(defaultState)} className="text-xs text-gray-600 hover:text-gray-800 underline">Reset</button>
+      </div>
     </form>
   )
 }

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Palette, Bot, Globe, Share2, CalendarClock, Megaphone, ListChecks, Workflow, LayoutGrid, Plug, Wrench, Phone, Link as LinkIcon, Shield } from 'lucide-react'
 import TierBadge from './TierBadge'
 import ActivityBoard from './ActivityBoard'
+import ExportBar from './ExportBar'
 
 function Card({ title, icon: Icon, children }){
   return (
@@ -29,7 +30,10 @@ export default function Results({ data }) {
           <h2 className="text-2xl font-semibold text-gray-900">Your AI Business Assistant</h2>
           <p className="text-gray-600 text-sm">Everything below is generated from your answers.</p>
         </div>
-        <TierBadge tier={tier} />
+        <div className="flex items-center gap-4">
+          <ExportBar data={data} />
+          <TierBadge tier={tier} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -100,7 +104,7 @@ export default function Results({ data }) {
               </thead>
               <tbody>
                 {(data.social_media_plan?.calendar_30_day||[]).slice(0,10).map((r,i)=> (
-                  <tr key={i} className="odd:bg-white even:bg-gray-50">
+                  <tr key={i} className="odd:bg:white even:bg-gray-50">
                     <td className="p-2">{r.day}</td>
                     <td className="p-2">{r.theme}</td>
                   </tr>
